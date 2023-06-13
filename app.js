@@ -1,14 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const routes = require('./routes/users');
+const mongoose = require('mongoose');
+const routes = require('./routes');
 
 const app = express();
 
 const { PORT = 3000 } = process.env;
 
-app.get('/', (req, res) => {
-  res.send('hello word2');
-});
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
+.then(()=>{
+  console.log('к БД подключен')
+})
+
 /*
 app.get('/users', (req, res) => {
   res.status(200);
