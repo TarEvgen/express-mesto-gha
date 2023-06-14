@@ -7,37 +7,41 @@ const app = express();
 
 const { PORT = 3000 } = process.env;
 
+
+
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
 .then(()=>{
   console.log('к БД подключен')
 })
 
-/*
-app.get('/users', (req, res) => {
-  res.status(200);
-  res.send(userData);
-});
-
-app.get('/users/:name', (req, res) => {
-  const { name } = req.params;
-  res.status(200);
-  res.send(userData.find((user) => user.name === name));
-});
-*/
-
 app.use(bodyParser.json());
-/*
-app.post('/users', (req, res) => {
-  const newUser = req.body;
-  console.log(newUser);
-  res.status(201);
-  res.send('Пользователь создан');
+
+
+
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: '64886556a0729f365906aca7' // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
+
+  next();
 });
-*/
 
 app.use(routes)
+
+module.exports.createCard = (req, res) => {
+  console.log(req.user._id); // _id станет доступен
+};
+
+
+
 
 
 app.listen(PORT, () => {
   console.log(`Сервер запушен на порту ${PORT}`);
 });
+
+/*
+module.exports.createCard = (req, res) => {
+  console.log(req.user._id, 'gggggg'); // _id станет доступен
+};*/
