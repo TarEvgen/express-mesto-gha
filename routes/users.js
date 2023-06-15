@@ -13,6 +13,7 @@ router.post('', createUser);
 
 
 router.patch('/me', updateUser);
+router.patch('/me/avatar', updateUser);
 
 /*
 router.delete('/:_id', deleteUserById);*/

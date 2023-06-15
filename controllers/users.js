@@ -43,15 +43,49 @@ const createUser = (req, res) => {
 
 const updateUser = (req, res) => {
 
-  Users.findByIdAndUpdate(req.user._id)
+  Users.findByIdAndUpdate(req.user._id,
+    req.body
+  , {new: true, runValidators: true})
+
+
+  .then((user) => {
+
+    if(user) {
+
+
+
+    res.send({ data: user })} else {
+
+      res.status(404).send({ message: "Пользователя не существует" })
+
+    }
+
+
+
+  }
+
+  )
+
+  .catch(err =>
+
+    {
+
+      if(err.name === 'ValidationError'){
+        return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
+        }
+        return res.status(500).send({message: 'Ошибка на сервере'})
+
+    });
+
 };
 
+/*
 router.patch('/:id', (req, res) => {
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(req.params.id, { name: 'Виктор Гусев' })
     .then(user => res.send({ data: user }))
     .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+});*/
 
 
 

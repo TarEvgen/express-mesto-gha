@@ -54,7 +54,31 @@ const createCards = (req, res) => {
   })
 };
 
+
+const likeCardById = (req, res) =>
+{Cards.findByIdAndUpdate(
+  req.params.cardId,
+  { $addToSet: {likes: req.user._id}},
+  { new: true },
+).then((card) =>{
+  res.send(card)
+})
+}
+
+const dislikeCardById = (req, res) =>
+{ Cards.findByIdAndUpdate(
+  req.params.cardId,
+  { $pull: { likes: req.user._id }  }, // убрать _id из массива
+  { new: true },
+).then((card) =>{
+  res.send(card)
+})
+
+}
+
+
+
 module.exports = {
   getCards,
-  createCards, deleteCardById
+  createCards, deleteCardById, likeCardById, dislikeCardById
 };
