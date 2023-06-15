@@ -31,7 +31,7 @@ const deleteCardById = (req, res) => {
     if(!card) {
       return res.status(404).send({massage: 'Карточка не найдена'})
     } else {
-      card.deleteOne().then(()=>{ res.send({massege: 'Карточка удалена'})
+      card.deleteOne().then(()=>{ return res.send({massege: 'Карточка удалена'})
 
     })
   }
