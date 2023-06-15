@@ -61,7 +61,21 @@ const likeCardById = (req, res) =>
   { $addToSet: {likes: req.user._id}},
   { new: true },
 ).then((card) =>{
-  res.send(card)
+
+  if(card) {
+
+
+
+    res.send(card)} else {
+
+      res.status(404).send({ message: "карточка не найден" })
+
+    }
+
+
+
+}).catch((err) => {
+  return res.status(500).send({message: 'Ошибка на сервере'})
 })
 }
 
@@ -71,7 +85,17 @@ const dislikeCardById = (req, res) =>
   { $pull: { likes: req.user._id }  }, // убрать _id из массива
   { new: true },
 ).then((card) =>{
-  res.send(card)
+  if(card) {
+
+
+
+    res.send(card)} else {
+
+      res.status(404).send({ message: "карточка не найден" })
+
+    }
+}).catch((err) => {
+  return res.status(500).send({message: 'Ошибка на сервере'})
 })
 
 }

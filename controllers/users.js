@@ -1,9 +1,13 @@
 const Users = require("../models/users");
 
 const getUsers = (req, res) => {
-  return Users.find({}).then((users) => {
-    return res.status(200).send(users);
-  });
+  return Users.find({})
+  .then((users) => {
+    return res.send(users);
+  })
+  .catch((err)=>{
+    return res.status(500).send({message: 'Ошибка на сервере'})
+  })
 };
 
 const getUserById = (req, res) => {
@@ -13,7 +17,7 @@ const getUserById = (req, res) => {
     if(!user){
       return res.status(404).send({message: 'Пользователь не найден'});
     }
-    return res.status(200).send(user);
+    return res.send(user);
   }).catch((err)=>{
     return res.status(500).send({message: 'Ошибка на сервере'})
   })
