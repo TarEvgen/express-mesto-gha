@@ -27,14 +27,13 @@ const getCardsById = (req, res) => {
 
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
-    Cards.findById(cardId).then((card) =>{
+    Cards.findByIdAndRemove(cardId).then((card) =>{
     if(!card) {
       return res.status(404).send({massage: 'Карточка не найдена'})
     } else {
-      card.deleteOne().then(()=>{ return res.send({massege: 'Карточка удалена'})
+      return res.send({massege: 'Карточка удалена'})
+    }
 
-    })
-  }
   }).catch((err)=>{
     if(err.name === 'ValidationError'){
     return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
