@@ -3,7 +3,10 @@ const Cards = require("../models/cards");
 const getCards = (req, res) => {
   return Cards.find({}).then((cards) => {
     return res.status(200).send(cards);
-  });
+  }).catch((err)=>{
+
+    return res.status(400).send({message: 'Ошибка на сервере'})
+  })
 };
 /*
 const getCardsById = (req, res) => {
@@ -32,6 +35,11 @@ const deleteCardById = (req, res) => {
 
     })
   }
+  }).catch((err)=>{
+    if(err.name === 'ValidationError'){
+    return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
+    }
+    return res.status(500).send({message: 'Ошибка на сервере'})
   })
 
 }

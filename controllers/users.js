@@ -7,7 +7,7 @@ const getUsers = (req, res) => {
     return res.send(users);
   })
   .catch((err)=>{
-    return res.status(500).send({message: 'Ошибка на сервере'})
+    return res.status(400).send({message: 'Ошибка на сервере'})
   })
 };
 
