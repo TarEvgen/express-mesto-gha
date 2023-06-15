@@ -36,7 +36,7 @@ const deleteCardById = (req, res) => {
 
   }).catch((err)=>{
     if(err.name === 'ValidationError'){
-    return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
+    return res.status(400).send({message: 'Некорректные данные'})
     }
     return res.status(400).send({message: 'Ошибка на сервере'})
   })
