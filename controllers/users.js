@@ -3,9 +3,7 @@ const Users = require("../models/users");
 const getUsers = (req, res) => {
   return Users.find({})
   .then((users) => {
-    if(!users){
-      return res.status(400).send({message: 'Переданы некорректные данные при создании пользователя'});
-    }
+
     return res.send(users);
   })
   .catch((err)=>{
@@ -22,7 +20,10 @@ const getUserById = (req, res) => {
     }
     return res.send(user);
   }).catch((err)=>{
-    return res.status(500).send({message: 'Ошибка на сервере'})
+    if(err.name === 'ValidationError'){
+      return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
+      }
+      return res.status(500).send({message: 'Ошибка на сервере'})
   })
   // res.status(200);
   // res.send(userData.find((user) => user.name === name));
