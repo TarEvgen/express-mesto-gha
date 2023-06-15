@@ -29,15 +29,15 @@ const deleteCardById = (req, res) => {
   const { cardId } = req.params;
     Cards.findByIdAndRemove(cardId).then((card) =>{
    if(!card) {
-     res.status(404).send({message: 'Карточка не найдена'})
+    return res.status(404).send({message: 'Карточка не найдена'})
    } else {
-      res.send({messege: 'Карточка удалена'})
+     return res.send({messege: 'Карточка удалена'})
     }
 
   }).catch((err)=>{
-   // if(err.name === 'ValidationError'){
-    //return res.status(404).send({message: 'не корректные данные'})
-   // }
+    if(err.name === 'ValidationError'){
+    return res.status(404).send({message: 'не корректные данные'})
+   }
     return res.status(400).send({message: 'Ошибка на сервере'})
   })
 
