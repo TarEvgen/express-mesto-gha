@@ -39,7 +39,7 @@ const deleteCardById = (req, res) => {
     if(err.name === 'ValidationError'){
     return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
     }
-    return res.status(500).send({message: 'Ошибка на сервере'})
+    return res.status(400).send({message: 'Ошибка на сервере'})
   })
 
 }
@@ -58,7 +58,7 @@ const createCards = (req, res) => {
     if(err.name === 'ValidationError'){
     return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
     }
-    return res.status(500).send({message: 'Ошибка на сервере'})
+    return res.status(400).send({message: 'Ошибка на сервере'})
   })
 };
 
@@ -83,7 +83,7 @@ const likeCardById = (req, res) =>
 
 
 }).catch((err) => {
-  return res.status(500).send({message: 'Ошибка на сервере'})
+  return res.status(400).send({message: 'Ошибка на сервере'})
 })
 }
 
@@ -99,11 +99,11 @@ const dislikeCardById = (req, res) =>
 
     res.send(card)} else {
 
-      res.status(404).send({ message: "карточка не найден" })
+      return res.status(404).send({ message: "карточка не найден" })
 
     }
 }).catch((err) => {
-  return res.status(500).send({message: 'Ошибка на сервере'})
+  return res.status(400).send({message: 'Ошибка на сервере'})
 })
 
 }
