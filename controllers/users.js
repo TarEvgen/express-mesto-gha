@@ -23,7 +23,7 @@ const getUserById = (req, res) => {
     if(err.name === 'ValidationError'){
       return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
       }
-      return res.status(500).send({message: 'Ошибка на сервере'})
+      return res.status(400).send({message: 'Ошибка на сервере'})
   })
   // res.status(200);
   // res.send(userData.find((user) => user.name === name));
@@ -41,7 +41,7 @@ const createUser = (req, res) => {
     if(err.name === 'ValidationError'){
     return res.status(400).send({message: `${Object.values(err.errors).map((err) => err.message).join(", ")}`})
     }
-    return res.status(500).send({message: 'Ошибка на сервере'})
+    return res.status(400).send({message: 'Ошибка на сервере'})
   })
 
   // console.log(newUser);
