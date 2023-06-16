@@ -3,10 +3,10 @@ const Cards = require('../models/cards');
 const getCards = (req, res) => {
   return Cards.find({})
     .then((cards) => {
-      return res.status(200).send(cards);
+      return res.send(cards);
     })
     .catch(() => {
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+      return res.status(500).send({ message: 'Ошибка на сервере' });
     });
 };
 
@@ -20,8 +20,16 @@ const deleteCardById = (req, res) => {
         return res.send({ messege: 'Карточка удалена' });
       }
     })
-    .catch(() => {
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданны некорректные данные' });
+     } else {
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+     }
+
+
+
+
     });
 };
 
@@ -43,7 +51,7 @@ const createCards = (req, res) => {
           message: 'Переданы некорректные данные'
         });
       }
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+      return res.status(500).send({ message: 'Ошибка на сервере' });
     });
 };
 
@@ -61,7 +69,11 @@ const likeCardById = (req, res) => {
       }
     })
     .catch((err) => {
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданны некорректные данные' });
+     } else {
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+     }
     });
 };
 
@@ -79,7 +91,11 @@ const dislikeCardById = (req, res) => {
       }
     })
     .catch((err) => {
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданны некорректные данные' });
+     } else {
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+     }
     });
 };
 
