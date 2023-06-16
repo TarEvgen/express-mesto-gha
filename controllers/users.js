@@ -1,51 +1,53 @@
 const Users = require('../models/users');
 
+const {
+  ERROR_REQUEST,
+  ERROR_FOUND,
+  ERROR_SERVER,
+} = require('../errors/const');
+
 const getUsers = (req, res) => {
-  return Users.find({})
+  Users.find({})
     .then((users) => {
-      return res.send(users);
+      res.send(users);
     })
-    .catch((err) => {
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+    .catch(() => {
+      res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
     });
 };
 
 const getUserById = (req, res) => {
-  console.log(req.params, 'req.params');
   const { _id } = req.params;
   return Users.findById(_id)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return res.status(ERROR_FOUND).send({ message: 'Пользователь не найден' });
       }
       return res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные'
-        });
+      if (err.name === 'CastError') {
+        return res.status(ERROR_REQUEST).send(
+          { message: 'Переданы некорректные данные' },
+        );
       }
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
     });
 };
 
 const createUser = (req, res) => {
-  const newUserData = req.body;
-  console.log(req.body, 'newUserData');
-
-  return Users.create(newUserData)
+  const { name, about, avatar } = req.body;
+  return Users.create({ name, about, avatar })
     .then((newUser) => {
-      console.log(newUser);
-      return res.status(201).send(newUser);
+      res.status(201).send(newUser);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные'
-        });
+        return res.status(ERROR_REQUEST).send(
+          { message: 'Переданы некорректные данные' },
+        );
       }
-      return res.status(400).send({ message: 'Ошибка на сервере' });
+      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
     });
 };
 
@@ -59,26 +61,23 @@ const updateUser = (req, res) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(404).send({ message: 'Пользователя не существует' });
+        res.status(ERROR_FOUND).send({ message: 'Пользователя не существует' });
       }
     })
 
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные'
-        });
+        return res.status(ERROR_REQUEST).send(
+          { message: 'Переданы некорректные данные' },
+        );
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
     });
 };
-
-const deleteUserById = (req, res) => {};
 
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateUser,
-  deleteUserById,
 };

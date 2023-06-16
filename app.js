@@ -8,9 +8,7 @@ const app = express();
 
 const { PORT = 3000 } = process.env;
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb').then(() => {
-  console.log('к БД подключен');
-});
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb').then(() => {});
 
 app.use(bodyParser.json());
 
@@ -24,6 +22,4 @@ app.use((req, res, next) => {
 
 app.use(routes);
 
-app.listen(PORT, () => {
-  console.log(`Сервер запушен на порту ${PORT}`);
-});
+app.listen(PORT, () => {});
