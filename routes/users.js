@@ -3,13 +3,13 @@ const router = require('express').Router();
 const {
   getUsers,
   getUserById,
-  createUser,
+  //createUser,
   updateUser,
 } = require('../controllers/users');
 
 router.get('', getUsers);
 router.get('/:_id', getUserById);
-router.post('', createUser);
+//router.post('', createUser);
 router.patch('/me', updateUser);
 router.patch('/me/avatar', updateUser);
 
