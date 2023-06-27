@@ -3,10 +3,13 @@ const bcrypt = require('bcrypt');
 
 const Users = require('../models/users');
 
+const jwt = require('jsonwebtoken');
+
 
 
 
 const saltRounds = 10;
+const JWT_SECRET = 'unique-secret-key'
 
 
 const {
@@ -24,8 +27,9 @@ const { email, password } = req.body;
 
 return Users.findOne({email})
 
+
     .then((user) => {
-     console.log(user, 'email')
+    
       if (!user) {
         return res.status(ERROR_FOUND).send({ message: 'Неправильные почта или пароль' });
       }
@@ -33,27 +37,21 @@ return Users.findOne({email})
 
       bcrypt.compare(password, user.password, function(err, isPasswordValue) {
         // result == true
-        console.log(password, 'password')
-        console.log(user.password, 'user.password')
-        console.log(isPasswordValue, 'isPasswordValue')
+      
 
         if (!isPasswordValue) {
           return res.status(ERROR_FOUND).send({ message: 'неправильный пароль__' });
         }
+const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' })
+        // создать и отдать токен
+            
+       
 
-        return res.send(user)
-
-    });
-
-
-
-/*
-      if (password !== user.password) {
-        return res.status(403).send({message: 'Неправильный пароль'})
-      }
-      return res.status(500).send(user)
-    */
-    
+        return res.send({token})
+          
+        
+        });
+        
   })
  .catch((err) => {
     if (err.name === 'CastError') {
@@ -61,7 +59,7 @@ return Users.findOne({email})
         { message: 'Переданы некорректные данные' },
       );
     }
-    return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере____' });
+    return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере  00000' });
   });
 
 
