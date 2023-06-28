@@ -27,6 +27,9 @@ module.exports = (req, res, next) => {
     // тут будет вся авторизация
 const { authorization } =req.headers
 
+console.log({ authorization })
+//console.log(authorization.startsWith('Bearer '))
+
 if (!authorization || !authorization.startsWith('Bearer ')) {
     return res
       .status(401)
@@ -34,10 +37,13 @@ if (!authorization || !authorization.startsWith('Bearer ')) {
   }
 
   const token = extractBearerToken(authorization);
+console.log(token, 'token')
 
   let payload;
+  console.log(payload, 'payload')
+
 try {
-  payload = jwt.verify(token, 'some-secret-key');
+  payload = jwt.verify(token, 'super-strong-secret');
 } catch (err) {
     // отправим ошибку, если не получилось
     return res

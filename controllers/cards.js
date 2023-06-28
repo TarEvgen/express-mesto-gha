@@ -18,13 +18,47 @@ const getCards = (req, res) => {
 
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
-  Cards.findByIdAndRemove(cardId)
+
+  Cards.findById(cardId)
+
+ // Cards.findOne(cardId)
+ //Cards.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_FOUND).send({ message: 'Карточка не найдена' });
-      } else {
-        res.send({ messege: 'Карточка удалена' });
+       return res.status(ERROR_FOUND).send({ message: 'Карточка не найдена' });
+       // console.log(card, 'card')
+      } 
+      if (card.owner.toString() !== req.user.id) {
+        console.log(card.owner.toString(), 'card.owner')
+        console.log(req.user.id, 'req.user.id')
+
+        res.status(ERROR_FOUND).send({ message: 'Вы не можете удалять чужие карточки' });
+
+      } else { 
+        
+       return Cards.findByIdAndRemove(cardId)
+       .then(() => {res.send({ messege: 'Карточка удалена' })})
+
+
+        console.log('что то тут не то')
+       // return card.remove({ messege: 'Карточка удалена' })
+      res.send({ messege: 'Карточка удалена' })
+        
+        //.then(()=> res.send({ messege: 'Карточка удалена' }))
+/*
+      //Cards.findByIdAndRemove(cardId)
+     // .then ((card) => {
+
+        //return res.send({ messege: 'Карточка удалена' });
+       // console.log(card.owner, 'card.owner')
+        //console.log(req.user.id, 'req.user.id')
+*/
+      
       }
+        
+    
+        
+      
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -37,7 +71,9 @@ const deleteCardById = (req, res) => {
 
 const createCards = (req, res) => {
   const newCardsData = req.body;
-  const owner = req.user._id;
+  console.log(newCardsData, 'newCardsData')
+  const owner = req.user.id;
+  console.log(owner, 'owner')
   return Cards.create({
     name: newCardsData.name,
     link: newCardsData.link,

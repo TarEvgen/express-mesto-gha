@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 
 
 const saltRounds = 10;
-const JWT_SECRET = 'unique-secret-key'
+//const JWT_SECRET = 'super-strong-secret'
 
 
 const {
@@ -25,7 +25,7 @@ const login = (req, res) => {
 const { email, password } = req.body;
 //console.log({ email, password } )
 
-return Users.findOne({email})
+return Users.findOne({email}).select('+password')
 
 
     .then((user) => {
@@ -42,7 +42,7 @@ return Users.findOne({email})
         if (!isPasswordValue) {
           return res.status(ERROR_FOUND).send({ message: 'неправильный пароль__' });
         }
-const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' })
+const token = jwt.sign({ id: user._id }, 'super-strong-secret', { expiresIn: '7d' })
         // создать и отдать токен
             
        
@@ -87,7 +87,7 @@ const getUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(ERROR_REQUEST).send(
-          { message: 'Переданы некорректные данные' },
+          { message: 'Переданы некорректные данные_' },
         );
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
@@ -109,7 +109,7 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_REQUEST).send(
-          { message: 'Переданы некорректные данные' },
+          { message: 'Переданы некорректные данные_' },
         );
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
@@ -127,8 +127,18 @@ const createUser = (req, res) => {
     
 };
 
+const getUser = (req, res) => {
+
+ // const { id } = req.user._id;
+  console.log(req.user.id , '{ id текущий пользователь }')
+  return Users.findById(req.user.id)
+    .then((user) => {return res.send(user)})
+
+}
+
 const updateUser = (req, res) => {
-  Users.findByIdAndUpdate(req.user._id, req.body, {
+  console.log(req.user.id, req.body, 'jjj')
+  Users.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
     runValidators: true,
   })
@@ -144,7 +154,7 @@ const updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_REQUEST).send(
-          { message: 'Переданы некорректные данные' },
+          { message: 'Переданы некорректные данные___' },
         );
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
@@ -156,5 +166,6 @@ module.exports = {
   getUserById,
   createUser,
   updateUser,
-  login
+  login,
+  getUser,
 };
