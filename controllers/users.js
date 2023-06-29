@@ -1,143 +1,91 @@
-
 const bcrypt = require('bcrypt');
-
-const Users = require('../models/users');
-
 const jwt = require('jsonwebtoken');
 
-
-
+const Users = require('../models/users');
+const NotFoundError = require('../errors/not-found-err');
+const BedRequest = require('../errors/bed-request');
+const Unauthorized = require('../errors/unauthorized');
 
 const saltRounds = 10;
-//const JWT_SECRET = 'super-strong-secret'
 
+const { ERROR_REQUEST, ERROR_FOUND, ERROR_SERVER } = require('../errors/const');
 
-const {
-  ERROR_REQUEST,
-  ERROR_FOUND,
-  ERROR_SERVER,
-} = require('../errors/const');
-
-
-
-const login = (req, res) => {
-
-const { email, password } = req.body;
-//console.log({ email, password } )
-
-return Users.findOne({email}).select('+password')
-
-
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  return Users.findOne({ email })
+    .select('+password')
     .then((user) => {
-    
       if (!user) {
-        return res.status(ERROR_FOUND).send({ message: 'Неправильные почта или пароль' });
+        throw new Unauthorized('Неправильные почта или пароль');
       }
 
-
-      bcrypt.compare(password, user.password, function(err, isPasswordValue) {
-        // result == true
-      
-
-        if (!isPasswordValue) {
-          return res.status(ERROR_FOUND).send({ message: 'неправильный пароль__' });
-        }
-const token = jwt.sign({ id: user._id }, 'super-strong-secret', { expiresIn: '7d' })
-        // создать и отдать токен
-            
-       
-
-        return res.send({token})
-          
-        
-        });
-        
-  })
- .catch((err) => {
-    if (err.name === 'CastError') {
-      return res.status(ERROR_REQUEST).send(
-        { message: 'Переданы некорректные данные' },
-      );
-    }
-    return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере  00000' });
-  });
-
-
-}
+      bcrypt.compare(
+        password,
+        user.password,
+        (err, isPasswordValue) => {
+          if (!isPasswordValue) {
+            next(new Unauthorized('Неправильные почта или пароль'));
+          } else {
+            const token = jwt.sign({ id: user._id }, 'super-strong-secret', {
+              expiresIn: '7d',
+            });
+            return res.send({ token });
+          }
+        })
+    })
+    .catch((err) => next(err));
+};
 
 const getUsers = (req, res) => {
   Users.find({})
     .then((users) => {
       res.send(users);
     })
-    .catch(() => {
-      res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
-    });
+    .catch((err) => next(err));
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   const { _id } = req.params;
   return Users.findById(_id)
     .then((user) => {
       if (!user) {
-        return res.status(ERROR_FOUND).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        return res.send(user);
       }
-      return res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(ERROR_REQUEST).send(
-          { message: 'Переданы некорректные данные_' },
-        );
-      }
-      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
-    });
+    .catch((err) => next(err));
 };
 
-const createUser = (req, res) => {
-  const { name, about, avatar, email, password } = req.body;
-  console.log(name, about, avatar, email, password)
-  
-  
-  bcrypt.hash(password, saltRounds, function(err, hash) {
-    
-    return Users.create({ name, about, avatar, email, password: hash })
-    .then(({ name, about, avatar, email, password: hash }) => {
-      
-      res.status(201).send({ name, about, avatar, email, password: hash });
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    Users.create({
+      name, about, avatar, email, password: hash,
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(ERROR_REQUEST).send(
-          { message: 'Переданы некорректные данные_' },
-        );
-      }
-      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
-    });
-
-
-
-
-
-    
-    
-  })
-  
- 
-    
+      .then(() => {
+        res.status(201).send({
+          name, about, avatar, email, password: hash,
+        });
+      })
+      .catch((error) => {
+        if (error.name === 'ValidationError') {
+          next (new BedRequest('Переданны не корректные данныеrr' ) )
+        }
+        next (error)
+      });
+  });
 };
 
 const getUser = (req, res) => {
-
- // const { id } = req.user._id;
-  console.log(req.user.id , '{ id текущий пользователь }')
-  return Users.findById(req.user.id)
-    .then((user) => {return res.send(user)})
-
-}
+  Users.findById(req.user.id).then((user) => {
+    res.send(user);
+  });
+};
 
 const updateUser = (req, res) => {
-  console.log(req.user.id, req.body, 'jjj')
   Users.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
     runValidators: true,
@@ -153,9 +101,9 @@ const updateUser = (req, res) => {
 
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_REQUEST).send(
-          { message: 'Переданы некорректные данные___' },
-        );
+        return res
+          .status(ERROR_REQUEST)
+          .send({ message: 'Переданы некорректные данные___' });
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
     });
