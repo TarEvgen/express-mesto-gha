@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const Users = require('../models/users');
+
 const NotFoundError = require('../errors/not-found-err');
 const BedRequest = require('../errors/bed-request');
 const Unauthorized = require('../errors/unauthorized');
@@ -28,14 +29,15 @@ const login = (req, res, next) => {
             const token = jwt.sign({ id: user._id }, 'super-strong-secret', {
               expiresIn: '7d',
             });
-            return res.send({ token });
+            res.send({ token });
           }
-        })
+        },
+      );
     })
     .catch((err) => next(err));
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   Users.find({})
     .then((users) => {
       res.send(users);
@@ -60,8 +62,8 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, saltRounds, (err, hash) => {
-    Users.create({
+  bcrypt.hash(password, saltRounds)
+    .then((hash) => Users.create({
       name, about, avatar, email, password: hash,
     })
       .then((newUser) => {
@@ -70,19 +72,18 @@ const createUser = (req, res, next) => {
           about: newUser.about,
           avatar: newUser.avatar,
           email: newUser.email,
-          _id: newUser._id
+          _id: newUser._id,
         });
-      })
-      .catch((error) => {
-        if (error.code === 11000) {
-          next(new Conflict('Пользователь уже существует'))
+      }))
+    .catch((error) => {
+      if (error.code === 11000) {
+        next(new Conflict('Пользователь уже существует'));
+      } else if (error.name === 'ValidationError') {
+        next(new BedRequest('Переданны не корректные данные'));
+      } else {
+        next(error);
       }
-        else if (error.name === 'ValidationError') {
-          next(new BedRequest('Переданны не корректные данные'))
-        } else {
-        next (error)}
-      });
-  });
+    });
 };
 
 const getUser = (req, res) => {
@@ -107,10 +108,9 @@ const updateUser = (req, res, next) => {
 
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        
-        next (new BedRequest('Переданны не корректные данные'))
+        next(new BedRequest('Переданны не корректные данные'));
       }
-      next (err)
+      next(err);
     });
 };
 

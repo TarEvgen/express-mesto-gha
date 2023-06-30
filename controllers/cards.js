@@ -2,8 +2,6 @@ const Cards = require('../models/cards');
 
 const NotFoundError = require('../errors/not-found-err');
 const BedRequest = require('../errors/bed-request');
-const Unauthorized = require('../errors/unauthorized');
-
 
 const getCards = (req, res, next) => {
   Cards.find({})
@@ -22,9 +20,7 @@ const deleteCardById = (req, res, next) => {
         throw new NotFoundError('Карточка не найдена');
       }
       if (card.owner.toString() !== req.user.id) {
-        
         throw new NotFoundError('Вы не можете удалять чужие карточки');
-       
       } else {
         return Cards.findByIdAndRemove(cardId).then(() => {
           res.send({ messege: 'Карточка удалена' });
@@ -33,12 +29,9 @@ const deleteCardById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        
-       next (new BedRequest('Переданны не корректные данные'))
-
-
+        next(new BedRequest('Переданны не корректные данные'));
       } else {
-        next (err)
+        next(err);
       }
     });
 };
@@ -56,10 +49,10 @@ const createCards = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        
-        next (new BedRequest('Переданны не корректные данные'))
-      }else{
-      next (err)}
+        next(new BedRequest('Переданны не корректные данные'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -67,22 +60,21 @@ const likeCardById = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user.id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (card) {
         res.send(card);
       } else {
         throw new NotFoundError('Карточка не найдена');
-        
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        
-        next (new BedRequest('Переданны не корректные данные'))
-      }else{
-      next (err)}
+        next(new BedRequest('Переданны не корректные данные'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -90,7 +82,7 @@ const dislikeCardById = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user.id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (card) {
@@ -101,10 +93,10 @@ const dislikeCardById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        
-        next (new BedRequest('Переданны не корректные данные'))
-      }else{
-      next (err)}
+        next(new BedRequest('Переданны не корректные данные'));
+      } else {
+        next(err);
+      }
     });
 };
 
