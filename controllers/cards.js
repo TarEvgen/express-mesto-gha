@@ -1,28 +1,30 @@
 const Cards = require('../models/cards');
-const { ERROR_REQUEST, ERROR_FOUND, ERROR_SERVER } = require('../errors/const');
 
-const getCards = (req, res) => {
+const NotFoundError = require('../errors/not-found-err');
+const BedRequest = require('../errors/bed-request');
+const Unauthorized = require('../errors/unauthorized');
+
+
+const getCards = (req, res, next) => {
   Cards.find({})
     .then((cards) => {
       res.send(cards);
     })
-    .catch(() => {
-      res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
-    });
+    .catch((err) => next(err));
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
 
   Cards.findById(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(ERROR_FOUND).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
       }
       if (card.owner.toString() !== req.user.id) {
-        res
-          .status(ERROR_FOUND)
-          .send({ message: 'Вы не можете удалять чужие карточки' });
+        
+        throw new NotFoundError('Вы не можете удалять чужие карточки');
+       
       } else {
         return Cards.findByIdAndRemove(cardId).then(() => {
           res.send({ messege: 'Карточка удалена' });
@@ -31,16 +33,17 @@ const deleteCardById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res
-          .status(ERROR_REQUEST)
-          .send({ message: 'Переданны некорректные данные' });
+        
+       next (new BedRequest('Переданны не корректные данные'))
+
+
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
+        next (err)
       }
     });
 };
 
-const createCards = (req, res) => {
+const createCards = (req, res, next) => {
   const newCardsData = req.body;
   const owner = req.user.id;
   return Cards.create({
@@ -53,59 +56,55 @@ const createCards = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res
-          .status(ERROR_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
-      }
-      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
+        
+        next (new BedRequest('Переданны не корректные данные'))
+      }else{
+      next (err)}
     });
 };
 
-const likeCardById = (req, res) => {
+const likeCardById = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
+    { $addToSet: { likes: req.user.id } },
     { new: true }
   )
     .then((card) => {
       if (card) {
         res.send(card);
       } else {
-        res.status(ERROR_FOUND).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
+        
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res
-          .status(ERROR_REQUEST)
-          .send({ message: 'Переданны некорректные данные' });
-      } else {
-        res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
-      }
+      if (err.name === 'ValidationError') {
+        
+        next (new BedRequest('Переданны не корректные данные'))
+      }else{
+      next (err)}
     });
 };
 
-const dislikeCardById = (req, res) => {
+const dislikeCardById = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } },
+    { $pull: { likes: req.user.id } },
     { new: true }
   )
     .then((card) => {
       if (card) {
         res.send(card);
       } else {
-        res.status(ERROR_FOUND).send({ message: 'Карточка не найден' });
+        throw new NotFoundError('Карточка не найдена');
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res
-          .status(ERROR_REQUEST)
-          .send({ message: 'Переданны некорректные данные' });
-      } else {
-        res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
-      }
+      if (err.name === 'ValidationError') {
+        
+        next (new BedRequest('Переданны не корректные данные'))
+      }else{
+      next (err)}
     });
 };
 

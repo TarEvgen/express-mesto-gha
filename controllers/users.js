@@ -8,8 +8,6 @@ const Unauthorized = require('../errors/unauthorized');
 
 const saltRounds = 10;
 
-const { ERROR_REQUEST, ERROR_FOUND, ERROR_SERVER } = require('../errors/const');
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
   return Users.findOne({ email })
@@ -72,7 +70,7 @@ const createUser = (req, res, next) => {
       })
       .catch((error) => {
         if (error.name === 'ValidationError') {
-          next (new BedRequest('Переданны не корректные данныеrr' ) )
+          next (new BedRequest('Переданны не корректные данные'))
         }
         next (error)
       });
@@ -85,7 +83,7 @@ const getUser = (req, res) => {
   });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   Users.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
     runValidators: true,
@@ -95,17 +93,16 @@ const updateUser = (req, res) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(ERROR_FOUND).send({ message: 'Пользователя не существует' });
+        throw new NotFoundError('Пользователь не найден');
       }
     })
 
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res
-          .status(ERROR_REQUEST)
-          .send({ message: 'Переданы некорректные данные___' });
+        
+        next (new BedRequest('Переданны не корректные данные'))
       }
-      return res.status(ERROR_SERVER).send({ message: 'Ошибка на сервере' });
+      next (err)
     });
 };
 
