@@ -7,13 +7,17 @@ const {
   getUser,
 } = require('../controllers/users');
 
+const {
+  checkBodyUser,
+} = require('../middlewares/validation');
+
 router.get('', getUsers);
 
 router.get('/me', getUser);
 
 router.get('/:_id', getUserById);
 
-router.patch('/me', updateUser);
-router.patch('/me/avatar', updateUser);
+router.patch('/me', checkBodyUser, updateUser);
+router.patch('/me/avatar', checkBodyUser, updateUser);
 
 module.exports = router;

@@ -1,8 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const {errors} = require('celebrate');
+
 
 const routes = require('./routes');
+
+
+const {
+  checkBodyLogin
+} = require('./middlewares/validation');
+
+
 
 const {
   login,
@@ -17,8 +26,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb').then(() => {});
 
 app.use(bodyParser.json());
 
-app.post('/signin', login);
-app.post('/signup', createUser); 
+app.post('/signin', checkBodyLogin, login);
+app.post('/signup', checkBodyLogin, createUser);
 
 /*
 app.use((req, res, next) => {
@@ -34,6 +43,7 @@ app.use((req, res, next) => {
 app.use(routes);
 
 /////////////////////
+app.use(errors());
 
 app.use((err, req, res, next) => {
 // res.status(err.statusCode).send({ message: err.message });
