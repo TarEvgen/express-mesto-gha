@@ -5,6 +5,7 @@ const Users = require('../models/users');
 const NotFoundError = require('../errors/not-found-err');
 const BedRequest = require('../errors/bed-request');
 const Unauthorized = require('../errors/unauthorized');
+const Conflict = require('../errors/conflict');
 
 const saltRounds = 10;
 
@@ -63,16 +64,23 @@ const createUser = (req, res, next) => {
     Users.create({
       name, about, avatar, email, password: hash,
     })
-      .then(() => {
+      .then((newUser) => {
         res.status(201).send({
-          name, about, avatar, email, password: hash,
+          name: newUser.name,
+          about: newUser.about,
+          avatar: newUser.avatar,
+          email: newUser.email,
+          _id: newUser._id
         });
       })
       .catch((error) => {
-        if (error.name === 'ValidationError') {
-          next (new BedRequest('Переданны не корректные данные'))
-        }
-        next (error)
+        if (error.code === 11000) {
+          next(new Conflict('Пользователь уже существует'))
+      }
+        else if (error.name === 'ValidationError') {
+          next(new BedRequest('Переданны не корректные данные'))
+        } else {
+        next (error)}
       });
   });
 };
