@@ -2,6 +2,7 @@ const Cards = require('../models/cards');
 
 const NotFoundError = require('../errors/not-found-err');
 const BedRequest = require('../errors/bed-request');
+const Forbidden = require('../errors/forbidden')
 
 const getCards = (req, res, next) => {
   Cards.find({})
@@ -20,7 +21,7 @@ const deleteCardById = (req, res, next) => {
         throw new NotFoundError('Карточка не найдена');
       }
       if (card.owner.toString() !== req.user.id) {
-        throw new NotFoundError('Вы не можете удалять чужие карточки');
+        throw new Forbidden('Вы не можете удалять чужие карточки');
       } else {
         return Cards.findByIdAndRemove(cardId).then(() => {
           res.send({ messege: 'Карточка удалена' });
@@ -70,10 +71,10 @@ const likeCardById = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BedRequest('Переданны не корректные данные'));
       } else {
-        next(err);
+        next(err);git 
       }
     });
 };
@@ -92,7 +93,7 @@ const dislikeCardById = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BedRequest('Переданны не корректные данные'));
       } else {
         next(err);
