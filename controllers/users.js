@@ -80,14 +80,14 @@ const createUser = (req, res, next) => {
           _id: newUser._id,
         });
       }))
-    .catch((error) => {
-      if (error.code === 11000) {
+    .catch((err) => {
+      if (err.code === 11000) {
         next(new Conflict('Пользователь уже существует'));
       }
-      if (error.name === 'CastError') {
+      if (err.name === 'CastError') {
         next(new BedRequest('Переданны некорректные данные'));
       } else {
-        next(error);
+        next(err);
       }
     });
 };
