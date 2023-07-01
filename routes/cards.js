@@ -10,8 +10,8 @@ const {
 
 const {
   checkBodyCard,
-  checkParamsId
-  
+  checkParamsId,
+
 } = require('../middlewares/validation');
 
 router.get('', getCards);

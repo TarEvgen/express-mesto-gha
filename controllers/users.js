@@ -12,7 +12,7 @@ const saltRounds = 10;
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return Users.findOne({email})
+  return Users.findOne({ email })
     .select('+password')
     .then((user) => {
       if (!user) {
@@ -29,7 +29,7 @@ const login = (req, res, next) => {
             const token = jwt.sign({ id: user._id }, 'super-strong-secret', {
               expiresIn: '7d',
             });
-            return res.send({ token });
+            res.send({ token });
           }
         },
       );
@@ -41,7 +41,6 @@ const getUsers = (req, res, next) => {
   Users.find({})
     .then((users) => {
       res.send(users);
-      console.log(users)
     })
     .catch((err) => next(err));
 };
@@ -73,7 +72,7 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     })
       .then((newUser) => {
-       return res.status(201).send({
+        res.status(201).send({
           name: newUser.name,
           about: newUser.about,
           avatar: newUser.avatar,
@@ -83,8 +82,8 @@ const createUser = (req, res, next) => {
       }))
     .catch((error) => {
       if (error.code === 11000) {
-        return next(new Conflict('Пользователь уже существует'));
-      } 
+        next(new Conflict('Пользователь уже существует'));
+      }
       if (error.name === 'ValidationError') {
         next(new BedRequest('Переданны некорректные данные'));
       } else {
