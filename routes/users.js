@@ -9,13 +9,14 @@ const {
 
 const {
   checkBodyUser,
+  checkParamsId,
 } = require('../middlewares/validation');
 
 router.get('', getUsers);
 
 router.get('/me', getUser);
 
-router.get('/:_id', getUserById);
+router.get('/:_id', checkParamsId, getUserById);
 
 router.patch('/me', checkBodyUser, updateUser);
 router.patch('/me/avatar', checkBodyUser, updateUser);

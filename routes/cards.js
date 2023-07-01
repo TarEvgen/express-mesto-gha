@@ -10,16 +10,18 @@ const {
 
 const {
   checkBodyCard,
+  checkParamsId
+  
 } = require('../middlewares/validation');
 
 router.get('', getCards);
 
 router.post('', checkBodyCard, createCards);
 
-router.delete('/:cardId', deleteCardById);
+router.delete('/:cardId', checkParamsId, deleteCardById);
 
-router.put('/:cardId/likes', likeCardById);
+router.put('/:cardId/likes', checkParamsId, likeCardById);
 
-router.delete('/:cardId/likes', dislikeCardById);
+router.delete('/:cardId/likes', checkParamsId, dislikeCardById);
 
 module.exports = router;
