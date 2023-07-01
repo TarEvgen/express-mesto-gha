@@ -84,7 +84,7 @@ const createUser = (req, res, next) => {
       if (error.code === 11000) {
         next(new Conflict('Пользователь уже существует'));
       }
-      if (error.name === 'ValidationError') {
+      if (error.name === 'CastError') {
         next(new BedRequest('Переданны некорректные данные'));
       } else {
         next(error);
@@ -113,7 +113,7 @@ const updateUser = (req, res, next) => {
     })
 
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BedRequest('Переданны не корректные данные'));
       }
       next(err);
