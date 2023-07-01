@@ -77,7 +77,7 @@ const createUser = (req, res, next) => {
       }))
     .catch((error) => {
       if (error.code === 11000) {
-        next(new Conflict('Пользователь уже существует'));
+        return next(new Conflict('Пользователь уже существует'));
       } else if (error.name === 'ValidationError') {
         next(new BedRequest('Переданны некорректные данные'));
       } else {
