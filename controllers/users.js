@@ -56,7 +56,12 @@ const getUserById = (req, res, next) => {
         return res.send(user);
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BedRequest('Переданны не корректные данные'));
+      }
+      next(err);
+    });
 };
 
 const createUser = (req, res, next) => {
