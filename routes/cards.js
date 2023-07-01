@@ -18,10 +18,10 @@ router.get('', getCards);
 
 router.post('', checkBodyCard, createCards);
 
-router.delete('/:cardId', checkParamsId, deleteCardById);
+router.delete('/:_id', checkParamsId, deleteCardById);
 
-router.put('/:cardId/likes', checkParamsId, likeCardById);
+router.put('/:_id/likes', checkParamsId, likeCardById);
 
-router.delete('/:cardId/likes', checkParamsId, dislikeCardById);
+router.delete('/:_id/likes', checkParamsId, dislikeCardById);
 
 module.exports = router;

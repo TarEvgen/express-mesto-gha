@@ -13,9 +13,9 @@ const getCards = (req, res, next) => {
 };
 
 const deleteCardById = (req, res, next) => {
-  const { cardId } = req.params;
+  const { _id } = req.params;
 
-  Cards.findById(cardId)
+  Cards.findById(_id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
@@ -23,7 +23,7 @@ const deleteCardById = (req, res, next) => {
       if (card.owner.toString() !== req.user.id) {
         throw new Forbidden('Вы не можете удалять чужие карточки');
       } else {
-        return Cards.findByIdAndRemove(cardId).then(() => {
+        return Cards.findByIdAndRemove(_id).then(() => {
           res.send({ messege: 'Карточка удалена' });
         });
       }
@@ -59,7 +59,7 @@ const createCards = (req, res, next) => {
 
 const likeCardById = (req, res, next) => {
   Cards.findByIdAndUpdate(
-    req.params.cardId,
+    req.params._id,
     { $addToSet: { likes: req.user.id } },
     { new: true },
   )
@@ -74,14 +74,14 @@ const likeCardById = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BedRequest('Переданны не корректные данные'));
       } else {
-        next(err);git 
+        next(err);
       }
     });
 };
 
 const dislikeCardById = (req, res, next) => {
   Cards.findByIdAndUpdate(
-    req.params.cardId,
+    req.params._id,
     { $pull: { likes: req.user.id } },
     { new: true },
   )
