@@ -26,7 +26,7 @@ const login = (req, res, next) => {
           if (!isPasswordValue) {
             next(new Unauthorized('Неправильные почта или пароль'));
           } else {
-            const token = jwt.sign({ id: user._id }, 'super-strong-secret', {
+            const token = jwt.sign({ id: user._id }, 'secret', {
               expiresIn: '7d',
             });
             res.send({ token });
@@ -57,7 +57,7 @@ const getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BedRequest('Переданны не корректные данные'));
+        next(new BedRequest('Переданны некорректные данные'));
       }
       next(err);
     });
@@ -114,7 +114,7 @@ const updateUser = (req, res, next) => {
 
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BedRequest('Переданны не корректные данные'));
+        next(new BedRequest('Переданны некорректные данные'));
       }
       next(err);
     });

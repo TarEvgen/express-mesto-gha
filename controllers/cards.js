@@ -49,7 +49,7 @@ const createCards = (req, res, next) => {
       res.status(201).send(newCard);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BedRequest('Переданны не корректные данные'));
       } else {
         next(err);
