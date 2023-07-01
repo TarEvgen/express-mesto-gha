@@ -12,7 +12,7 @@ const saltRounds = 10;
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return Users.findOne({ email })
+  return Users.findOne({email})
     .select('+password')
     .then((user) => {
       if (!user) {
@@ -41,6 +41,7 @@ const getUsers = (req, res, next) => {
   Users.find({})
     .then((users) => {
       res.send(users);
+      console.log(users)
     })
     .catch((err) => next(err));
 };
