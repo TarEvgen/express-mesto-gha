@@ -1,9 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-const extractBearerToken = (header) => {
-  header.replace('Bearer ', '');
-};
-
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -12,7 +8,7 @@ module.exports = (req, res, next) => {
       .status(401)
       .send({ message: 'Необходима авторизация' });
   }
-  const token = extractBearerToken(authorization);
+  const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, 'super-strong-secret');

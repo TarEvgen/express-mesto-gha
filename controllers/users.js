@@ -67,7 +67,7 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     })
       .then((newUser) => {
-        res.status(201).send({
+       return res.status(201).send({
           name: newUser.name,
           about: newUser.about,
           avatar: newUser.avatar,
