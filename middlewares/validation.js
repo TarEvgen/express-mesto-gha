@@ -27,7 +27,7 @@ const checkBodyUser = celebrate({
 
 const checkParamsId = celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().alphanum().length(24),
+    _id: Joi.string().length(24).hex().required(),
   }),
 });
 

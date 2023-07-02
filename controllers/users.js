@@ -58,6 +58,7 @@ const getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BedRequest('Переданны некорректные данные'));
+        return;
       }
       next(err);
     });
@@ -83,6 +84,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         next(new Conflict('Пользователь уже существует'));
+        return;
       }
       if (err.name === 'CastError') {
         next(new BedRequest('Переданны некорректные данные'));
@@ -115,6 +117,7 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BedRequest('Переданны некорректные данные'));
+        return;
       }
       next(err);
     });
