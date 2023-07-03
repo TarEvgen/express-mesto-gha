@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const routes = require('./routes');
 
 const {
@@ -22,10 +24,14 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb').then(() => {});
 
 app.use(bodyParser.json());
 
+app.use(requestLogger);
+
 app.post('/signin', checkBodyLogin, login);
 app.post('/signup', checkBodyLogin, createUser);
 
 app.use(routes);
+
+app.use(errorLogger);
 
 app.use(errors());
 
